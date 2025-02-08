@@ -1,0 +1,6 @@
+@rtu_schedule_analyzer_HostAddress = http://localhost:5156
+
+GET {{rtu_schedule_analyzer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
