@@ -2,10 +2,17 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 #
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.API", "Project.API\Project.API.csproj", "{FA5EE5EC-2ED7-4811-ADB5-4CC4E55B859F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{00081D13-FF6F-4775-9B73-92446F48E5D0} = {00081D13-FF6F-4775-9B73-92446F48E5D0}
+		{5F4B408F-5221-44E8-B41F-67CE5D3F0CFB} = {5F4B408F-5221-44E8-B41F-67CE5D3F0CFB}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.Core", "Project.Core\Project.Core.csproj", "{00081D13-FF6F-4775-9B73-92446F48E5D0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.Infrastructure", "Project.Infrastructure\Project.Infrastructure.csproj", "{5F4B408F-5221-44E8-B41F-67CE5D3F0CFB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{00081D13-FF6F-4775-9B73-92446F48E5D0} = {00081D13-FF6F-4775-9B73-92446F48E5D0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
