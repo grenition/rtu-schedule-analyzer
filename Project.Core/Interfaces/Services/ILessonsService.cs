@@ -1,9 +1,11 @@
+using Project.Core.ViewModels;
+
 namespace Project.Core.Interfaces.Services;
 
 using Entities;
 
 public interface ILessonsService
 {
-    Task<IEnumerable<Lesson>> GetAllLessons(string searchKey, CancellationToken cancellationToken);
-    IEnumerable<Inconvenience> GetInconveniences(IEnumerable<Lesson>? lessons);
+    Task<IEnumerable<Lesson>> SearchAllLessons(string searchKey, CancellationToken cancellationToken);
+    Task<IEnumerable<SearchInconvenienceViewModel>> SearchInconveniences(string searchKey, CancellationToken cancellationToken);
 }

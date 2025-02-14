@@ -15,7 +15,7 @@ public class LessonsController(ILessonsService lessonsService) : ControllerBase
         if (string.IsNullOrEmpty(searchKey))
             return BadRequest("Search Key is invalid!");
 
-        var lessons = await _lessonsService.GetAllLessons(searchKey, cancellationToken);
+        var lessons = await _lessonsService.SearchAllLessons(searchKey, cancellationToken);
 
         return Ok(lessons);
     }
@@ -26,9 +26,8 @@ public class LessonsController(ILessonsService lessonsService) : ControllerBase
         if (string.IsNullOrEmpty(searchKey))
             return BadRequest("Search Key is invalid!");
 
-        var lessons = await _lessonsService.GetAllLessons(searchKey, cancellationToken);
-        var conveniences = _lessonsService.GetInconveniences(lessons);
+        var inconveniences = await _lessonsService.SearchInconveniences(searchKey, cancellationToken);
 
-        return Ok(conveniences);
+        return Ok(inconveniences);
     }
 }
