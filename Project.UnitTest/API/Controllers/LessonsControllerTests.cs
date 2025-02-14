@@ -3,6 +3,7 @@ using Moq;
 using Project.API.Controllers;
 using Project.Core.Entities;
 using Project.Core.Interfaces.Services;
+using Project.Core.ViewModels;
 
 namespace Project.UnitTest.API.Controllers
 {
@@ -27,14 +28,14 @@ namespace Project.UnitTest.API.Controllers
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Search Key is invalid!", badRequest.Value);
         }
-        
+
         [Fact]
         public async Task GetAllLessons_ReturnsBadRequest_WhenSearchKeyIsEmpty()
         {
             string? searchKey = string.Empty;
 
             var result = await _controller.GetAllLessons(searchKey, CancellationToken.None);
-            
+
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Search Key is invalid!", badRequest.Value);
         }
@@ -42,25 +43,32 @@ namespace Project.UnitTest.API.Controllers
         [Fact]
         public async Task GetAllLessons_ReturnsOkWithLessons_WhenSearchKeyIsValid()
         {
-            string? searchKey = "test";
-            var lessonList = new List<Lesson>
+            string searchKey = "test";
+            var lessons = new List<Lesson>
             {
-                new Lesson { Id = "1", Discipline = "Math", Start = DateTimeOffset.Now, End = DateTimeOffset.Now.AddHours(1) }
+                new Lesson
+                {
+                    Id = "1",
+                    Discipline = "Math",
+                    Start = DateTimeOffset.Now,
+                    End = DateTimeOffset.Now.AddHours(1)
+                }
             };
 
             _lessonsServiceMock
-                .Setup(s => s.GetAllLessons(searchKey, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(lessonList);
+                .Setup(s => s.SearchAllLessons(searchKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(lessons);
 
             var result = await _controller.GetAllLessons(searchKey, CancellationToken.None);
 
             var okResult = Assert.IsType<OkObjectResult>(result);
             var returnedValue = Assert.IsAssignableFrom<IEnumerable<Lesson>>(okResult.Value);
             Assert.Single(returnedValue);
+            Assert.Equal("1", returnedValue.First().Id);
         }
 
         [Fact]
-        public async Task GetAllInconveniences_ReturnsBadRequest_WhenSearchKeyIsNullOrEmpty()
+        public async Task GetAllInconveniences_ReturnsBadRequest_WhenSearchKeyIsNull()
         {
             string? searchKey = null;
 
@@ -71,48 +79,55 @@ namespace Project.UnitTest.API.Controllers
         }
 
         [Fact]
+        public async Task GetAllInconveniences_ReturnsBadRequest_WhenSearchKeyIsEmpty()
+        {
+            string? searchKey = string.Empty;
+
+            var result = await _controller.GetAllInconveniences(searchKey, CancellationToken.None);
+
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Search Key is invalid!", badRequest.Value);
+        }
+
+        [Fact]
         public async Task GetAllInconveniences_ReturnsOkWithInconveniences_WhenSearchKeyIsValid()
         {
-            string? searchKey = "group-101";
-            var lessonList = new List<Lesson>
+            string searchKey = "group-101";
+            
+            var inconvenienceList = new List<SearchInconvenienceViewModel>
             {
-                new Lesson
-                {
-                    Id = "1", 
-                    Discipline = "Math", 
-                    Campus = "Main", 
-                    Start = DateTimeOffset.Now, 
-                    End = DateTimeOffset.Now.AddHours(1)
-                },
-                new Lesson
-                {
-                    Id = "2", 
-                    Discipline = "Physics", 
-                    Campus = "Second", 
-                    Start = DateTimeOffset.Now.AddHours(2), 
-                    End = DateTimeOffset.Now.AddHours(3)
-                }
-            };
-
-            var inconvenienceList = new List<Inconvenience>
-            {
-                new Inconvenience { Type = "WINDOW", FromLessonId = "1", ToLessonId = "2" },
-                new Inconvenience { Type = "DIFF_CAMPUS", FromLessonId = "1", ToLessonId = "2" }
+                new SearchInconvenienceViewModel(
+                    new Inconvenience
+                    {
+                        FromLessonId = "1",
+                        ToLessonId = "2",
+                        Type = "WINDOW"
+                    },
+                    searchKey
+                ),
+                new SearchInconvenienceViewModel(
+                    new Inconvenience
+                    {
+                        FromLessonId = "1",
+                        ToLessonId = "2",
+                        Type = "DIFF_CAMPUS"
+                    },
+                    searchKey
+                )
             };
 
             _lessonsServiceMock
-                .Setup(s => s.GetAllLessons(searchKey, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(lessonList);
-
-            _lessonsServiceMock
-                .Setup(s => s.GetInconveniences(It.IsAny<IEnumerable<Lesson>>()))
-                .Returns(inconvenienceList);
+                .Setup(s => s.SearchInconveniences(searchKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(inconvenienceList);
 
             var result = await _controller.GetAllInconveniences(searchKey, CancellationToken.None);
 
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnedValue = Assert.IsAssignableFrom<IEnumerable<Inconvenience>>(okResult.Value);
-            Assert.Equal(2, (returnedValue as List<Inconvenience>)?.Count);
+            var returnedValue = Assert.IsAssignableFrom<IEnumerable<SearchInconvenienceViewModel>>(okResult.Value);
+
+            Assert.Equal(2, returnedValue.Count());
+            Assert.Contains(returnedValue, i => i.Type == "WINDOW");
+            Assert.Contains(returnedValue, i => i.Type == "DIFF_CAMPUS");
         }
     }
 }
