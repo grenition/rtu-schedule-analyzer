@@ -30,4 +30,15 @@ public class LessonsController(ILessonsService lessonsService) : ControllerBase
 
         return Ok(inconveniences);
     }
+
+    [HttpPost("clearCache")]
+    public async Task<IActionResult> ClearCache([FromQuery] string? searchKey, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(searchKey))
+            return BadRequest("Search Key is invalid!");
+
+        await lessonsService.ClearCache(searchKey);
+
+        return Ok();
+    }
 }

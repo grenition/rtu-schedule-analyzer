@@ -8,6 +8,7 @@ public static class ProjectInfrastructureExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<IScheduleRepository, ScheduleRepository>();
+        services.AddScoped<IInconveniencesRepository, InconveniencesRepository>();
 
         return services;
     }

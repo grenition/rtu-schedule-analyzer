@@ -7,7 +7,7 @@ public static class ProjectCoreExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddSingleton<ILessonsService, LessonsService>();
+        services.AddScoped<ILessonsService, LessonsService>();
 
         return services;
     }

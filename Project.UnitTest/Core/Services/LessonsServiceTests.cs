@@ -7,13 +7,32 @@ namespace Project.UnitTest.Core.Services
 {
     public class LessonsServiceTests
     {
-        private readonly Mock<IScheduleRepository> _scheduleRepositoryMock;
+        private readonly Mock<IScheduleRepository> _scheduleRepositoryMock = new();
+        private readonly Mock<IInconveniencesRepository> _inconveniencesRepositoryMock = new();
         private readonly LessonsService _lessonsService;
 
         public LessonsServiceTests()
         {
-            _scheduleRepositoryMock = new Mock<IScheduleRepository>();
-            _lessonsService = new LessonsService(_scheduleRepositoryMock.Object);
+            _inconveniencesRepositoryMock
+                .Setup(r => r.GetFirst(It.IsAny<string>()))
+                .ReturnsAsync((SearchInconvenience)null);
+
+            _inconveniencesRepositoryMock
+                .Setup(r => r.GetInconviences(It.IsAny<string>()))
+                .Returns(new List<SearchInconvenience>().ToAsyncEnumerable());
+
+            _inconveniencesRepositoryMock
+                .Setup(r => r.AddRange(It.IsAny<IEnumerable<SearchInconvenience>>()))
+                .Returns(Task.CompletedTask);
+
+            _inconveniencesRepositoryMock
+                .Setup(r => r.RemoveInconviences(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            _lessonsService = new LessonsService(
+                _scheduleRepositoryMock.Object,
+                _inconveniencesRepositoryMock.Object
+            );
         }
 
         [Fact]
