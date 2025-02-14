@@ -10,27 +10,24 @@ services:
     depends_on:
       - db
     environment:
-      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING_DEFAULT}
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=main;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     networks:
-      - deploy-guide-dev
+      - back
 
   db:
     image: postgres:16
-    container_name: postgres-db
     restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: main
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
     networks:
-      - deploy-guide-dev
+      - back
     volumes:
       - pgdata:/var/lib/postgresql/data
 
 networks:
-  deploy-guide-dev:
+  back:
     driver: bridge
 
 volumes:

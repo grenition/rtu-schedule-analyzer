@@ -119,3 +119,6 @@ src/.vs/config/applicationhost.config
 
 # Evnvironment variables
 .env
+
+# Debug configurations
+docker-compose.override.yml
