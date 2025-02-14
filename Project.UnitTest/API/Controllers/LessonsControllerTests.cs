@@ -3,7 +3,6 @@ using Moq;
 using Project.API.Controllers;
 using Project.Core.Entities;
 using Project.Core.Interfaces.Services;
-using Project.Core.ViewModels;
 
 namespace Project.UnitTest.API.Controllers
 {
@@ -94,26 +93,22 @@ namespace Project.UnitTest.API.Controllers
         {
             string searchKey = "group-101";
             
-            var inconvenienceList = new List<SearchInconvenienceViewModel>
+            var inconvenienceList = new List<SearchInconvenience>
             {
-                new SearchInconvenienceViewModel(
-                    new Inconvenience
-                    {
+                new SearchInconvenience()
+                {
                         FromLessonId = "1",
                         ToLessonId = "2",
-                        Type = "WINDOW"
-                    },
-                    searchKey
-                ),
-                new SearchInconvenienceViewModel(
-                    new Inconvenience
-                    {
-                        FromLessonId = "1",
-                        ToLessonId = "2",
-                        Type = "DIFF_CAMPUS"
-                    },
-                    searchKey
-                )
+                        Type = "WINDOW",
+                        SearchKey = searchKey 
+                },
+                new SearchInconvenience()
+                {
+                    FromLessonId = "1",
+                    ToLessonId = "2",
+                    Type = "DIFF_CAMPUS",
+                    SearchKey = searchKey 
+                }
             };
 
             _lessonsServiceMock
@@ -123,7 +118,7 @@ namespace Project.UnitTest.API.Controllers
             var result = await _controller.GetAllInconveniences(searchKey, CancellationToken.None);
 
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnedValue = Assert.IsAssignableFrom<IEnumerable<SearchInconvenienceViewModel>>(okResult.Value);
+            var returnedValue = Assert.IsAssignableFrom<IEnumerable<SearchInconvenience>>(okResult.Value);
 
             Assert.Equal(2, returnedValue.Count());
             Assert.Contains(returnedValue, i => i.Type == "WINDOW");

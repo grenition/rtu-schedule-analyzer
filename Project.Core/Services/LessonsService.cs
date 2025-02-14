@@ -1,7 +1,6 @@
 using Project.Core.Entities;
 using Project.Core.Interfaces.Repositories;
 using Project.Core.Interfaces.Services;
-using Project.Core.ViewModels;
 
 namespace Project.Core.Services;
 
@@ -13,11 +12,11 @@ public class LessonsService(IScheduleRepository scheduleRepository) : ILessonsSe
             .OrderBy(x => x.Start)
             .ToListAsync(cancellationToken);
 
-    public async Task<IEnumerable<SearchInconvenienceViewModel>> SearchInconveniences(string searchKey, CancellationToken cancellationToken)
+    public async Task<IEnumerable<SearchInconvenience>> SearchInconveniences(string searchKey, CancellationToken cancellationToken)
     {
         var lessons = await SearchAllLessons(searchKey, cancellationToken);
 
-        var inconvenieces = new List<SearchInconvenienceViewModel>();
+        var inconvenieces = new List<SearchInconvenience>();
         Lesson? previousLesson = null;
         
         foreach (var lesson in lessons.OrderBy(x => x.Start))
@@ -29,26 +28,28 @@ public class LessonsService(IScheduleRepository scheduleRepository) : ILessonsSe
             }
 
             if ((lesson.Start - previousLesson.End).TotalHours >= 1.0)
-                inconvenieces.Add(new SearchInconvenienceViewModel(new()
+                inconvenieces.Add(new SearchInconvenience()
                 {
+                    Id = Guid.NewGuid().ToString(),
                     FromLessonId = previousLesson.Id,
-                    FromLesson = previousLesson,
                     ToLessonId = lesson.Id,
-                    ToLesson = lesson,
                     Type = "WINDOW",
-                    Date = DateOnly.FromDateTime(lesson.Start.Date)
-                }, searchKey));
+                    Date = DateOnly.FromDateTime(lesson.Start.Date),
+                    SearchKey = searchKey,
+                    SearchTime = DateTime.Now
+                });
 
             if (previousLesson.Campus != lesson.Campus)
-                inconvenieces.Add(new SearchInconvenienceViewModel(new()
+                inconvenieces.Add(new SearchInconvenience()
                 {
+                    Id = Guid.NewGuid().ToString(),
                     FromLessonId = previousLesson.Id,
-                    FromLesson = previousLesson,
                     ToLessonId = lesson.Id,
-                    ToLesson = lesson,
                     Type = "DIFF_CAMPUS",
-                    Date = DateOnly.FromDateTime(lesson.Start.Date)
-                }, searchKey));
+                    Date = DateOnly.FromDateTime(lesson.Start.Date),
+                    SearchKey = searchKey,
+                    SearchTime = DateTime.Now
+                });
             
             previousLesson = lesson;
         }
